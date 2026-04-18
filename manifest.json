@@ -1,0 +1,10 @@
+{
+	"id": "obsidian-block-refs",
+	"name": "Block References",
+	"version": "0.1.0",
+	"minAppVersion": "0.15.0",
+	"description": "Logseq-style linked block references for tags. Click a tag to see all blocks referencing it.",
+	"author": "Philipp Pollmann",
+	"authorUrl": "https://github.com/philipppollmann",
+	"isDesktopOnly": false
+}
