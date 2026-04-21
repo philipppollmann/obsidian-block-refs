@@ -1,4 +1,4 @@
-import { Plugin, SuggestModal, WorkspaceLeaf } from "obsidian";
+import { Notice, Plugin, SuggestModal, WorkspaceLeaf } from "obsidian";
 import { BlockRefsView, VIEW_TYPE_BLOCK_REFS } from "./src/view";
 import {
 	BlockRefsSettingTab,
@@ -29,6 +29,9 @@ export default class BlockRefsPlugin extends Plugin {
 				new TagSuggestModal(this).open();
 			},
 		});
+
+		console.log("Block References plugin loaded");
+		new Notice("Block References plugin loaded");
 	}
 
 	async loadSettings(): Promise<void> {

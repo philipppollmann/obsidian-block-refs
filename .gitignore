@@ -12,7 +12,9 @@ data.json
 
 # IDE
 .vscode/
-.idea/
+.claude
+.idea
+
 
 # OS
 .DS_Store
