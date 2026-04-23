@@ -3,6 +3,7 @@ import {
 	WorkspaceLeaf,
 	MarkdownRenderer,
 	setIcon,
+	TFile,
 } from "obsidian";
 import type BlockRefsPlugin from "../main";
 import { extractBlockRefs, FileBlockRefs } from "./blockExtractor";
@@ -100,6 +101,9 @@ export class BlockRefsView extends ItemView {
 			cls: "block-refs-page-title",
 		});
 
+		// Render matching page content if a file with the tag name exists
+		await this.renderPageContent(pageEl, tagName);
+
 		const results = await extractBlockRefs(this.app, this.currentTag);
 
 		// Count total blocks
@@ -154,6 +158,56 @@ export class BlockRefsView extends ItemView {
 		for (const fileRefs of results) {
 			await this.renderFileGroup(refsContent, fileRefs);
 		}
+	}
+
+	/**
+	 * If a markdown file matching the tag name exists, render its content
+	 * above the linked references (like a Logseq page).
+	 */
+	private async renderPageContent(
+		container: HTMLElement,
+		tagName: string
+	): Promise<void> {
+		// Search for a file matching the tag name (case-insensitive)
+		const allFiles = this.app.vault.getMarkdownFiles();
+		const pageFile = allFiles.find(
+			(f) => f.basename.toLowerCase() === tagName.toLowerCase()
+		);
+
+		if (!pageFile) return;
+
+		const pageSection = container.createDiv({
+			cls: "block-refs-page-content",
+		});
+
+		// Clickable file link header
+		const pageHeader = pageSection.createDiv({
+			cls: "block-refs-page-header",
+		});
+		const pageIcon = pageHeader.createSpan({
+			cls: "block-refs-file-icon",
+		});
+		setIcon(pageIcon, "file-text");
+		pageHeader.createSpan({
+			text: pageFile.basename,
+			cls: "block-refs-file-name",
+		});
+		pageHeader.addEventListener("click", () => {
+			this.app.workspace.getLeaf(false).openFile(pageFile);
+		});
+
+		// Render page markdown
+		const contentEl = pageSection.createDiv({
+			cls: "block-refs-page-body",
+		});
+		const fileContent = await this.app.vault.cachedRead(pageFile);
+		await MarkdownRenderer.render(
+			this.app,
+			fileContent,
+			contentEl,
+			pageFile.path,
+			this
+		);
 	}
 
 	private async renderFileGroup(
